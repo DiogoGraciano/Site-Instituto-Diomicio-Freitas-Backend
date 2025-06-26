@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Get, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Body, Controller, Post, Get, UseGuards, HttpCode, HttpStatus, Delete, Param, Put } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -11,10 +11,16 @@ import { User } from './entities/user.entity';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Public()
+  @UseGuards(JwtAuthGuard)
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put('users/:id')
+  async update(@Param('id') id: string, @Body() registerDto: RegisterDto) {
+    return this.authService.update(id, registerDto);
   }
 
   @Public()
@@ -37,5 +43,18 @@ export class AuthController {
         updatedAt: user.updatedAt,
       }
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('users')
+  async findAll() {
+    const users = await this.authService.findAll();
+    return { users };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('users/:id')
+  async remove(@Param('id') id: string) {
+    return this.authService.remove(id);
   }
 } 

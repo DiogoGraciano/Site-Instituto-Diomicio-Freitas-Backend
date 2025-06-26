@@ -53,7 +53,7 @@ export class PostsService {
   async findOne(id: string): Promise<Post> {
     const post = await this.postRepository.findOne({ where: { id } });
     if (!post) {
-      throw new NotFoundException(`Post with ID ${id} not found`);
+      throw new NotFoundException(`Post com ID ${id} não encontrado`);
     }
     return post;
   }
@@ -61,7 +61,7 @@ export class PostsService {
   async findBySlug(slug: string): Promise<Post> {
     const post = await this.postRepository.findOne({ where: { slug } });
     if (!post) {
-      throw new NotFoundException(`Post with slug ${slug} not found`);
+      throw new NotFoundException(`Post com slug ${slug} não encontrado`);
     }
     return post;
   }

@@ -32,7 +32,7 @@ export class ActivitiesService {
   async findOne(id: string): Promise<Activity> {
     const activity = await this.activityRepository.findOne({ where: { id } });
     if (!activity) {
-      throw new NotFoundException(`Activity with ID ${id} not found`);
+      throw new NotFoundException(`Atividade com ID ${id} não encontrada`);
     }
     return activity;
   }

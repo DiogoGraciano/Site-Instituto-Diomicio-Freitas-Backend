@@ -11,6 +11,9 @@ export class Contact {
   @Column()
   phone: string;
 
+  @Column({ nullable: true })
+  email?: string;
+
   @Column()
   subject: string;
 

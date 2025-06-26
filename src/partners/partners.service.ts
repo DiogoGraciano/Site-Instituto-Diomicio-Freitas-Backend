@@ -31,7 +31,7 @@ export class PartnersService {
   async findOne(id: string): Promise<Partner> {
     const partner = await this.partnerRepository.findOne({ where: { id } });
     if (!partner) {
-      throw new NotFoundException(`Partner with ID ${id} not found`);
+      throw new NotFoundException(`Parceiro com ID ${id} não encontrado`);
     }
     return partner;
   }

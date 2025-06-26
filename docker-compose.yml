@@ -1,10 +1,7 @@
-version: '3.8'
-
 services:
   # PostgreSQL Database
   postgres:
     image: postgres:17-alpine
-    restart: unless-stopped
     environment:
       POSTGRES_DB: easy_order
       POSTGRES_USER: postgres
@@ -12,31 +9,40 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d
+      - postgres_data_dev:/var/lib/postgresql/data
+      - .:/usr/src/app
     networks:
-      - easy-order-network
-
-  # NestJS Application
+      - easy-order-network-dev
+  # NestJS Application (Development)
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    restart: unless-stopped
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - CORS_ORIGIN=http://localhost:5173
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=easy_order
+      - R2_ENDPOINT=https://ed534f30605abca289cc30074b92c617.r2.cloudflarestorage.com
+      - R2_ACCESS_KEY_ID=b477ce74ffead510aef5a7c56754ed28
+      - R2_SECRET_ACCESS_KEY=f6de771ffcf164aab7c8ccd6d34528a5ac1f2367f68e5e03d352d59bc8d8cb68
+      - R2_BUCKET_NAME=easyorder
+      - R2_PUBLIC_URL=https://cdn-easyorder.calendarnow.com.br
     depends_on:
       - postgres
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
     networks:
-      - easy-order-network
-    command: npm run start:dev
-
+      - easy-order-network-dev
 volumes:
-  postgres_data:
+  postgres_data_dev:
 
 networks:
-  easy-order-network:
+  easy-order-network-dev:
     driver: bridge 

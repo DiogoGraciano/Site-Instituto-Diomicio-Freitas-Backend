@@ -32,7 +32,7 @@ export class ProjectsService {
   async findOne(id: string): Promise<Project> {
     const project = await this.projectRepository.findOne({ where: { id } });
     if (!project) {
-      throw new NotFoundException(`Project with ID ${id} not found`);
+      throw new NotFoundException(`Projeto com ID ${id} não encontrado`);
     }
     return project;
   }

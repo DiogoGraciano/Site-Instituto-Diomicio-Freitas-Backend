@@ -24,7 +24,7 @@ export class HistoryService {
   async findOne(id: string): Promise<History> {
     const history = await this.historyRepository.findOne({ where: { id } });
     if (!history) {
-      throw new NotFoundException(`History with ID ${id} not found`);
+      throw new NotFoundException(`Histórico com ID ${id} não encontrado`);
     }
     return history;
   }
