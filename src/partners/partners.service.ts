@@ -15,7 +15,11 @@ export class PartnersService {
 
   async create(createPartnerDto: CreatePartnerDto, logo: Express.Multer.File): Promise<Partner> {
     const logoUrl = await this.s3Service.uploadFile(logo, 'partners');
-    
+
+    if(!logoUrl) {
+      throw new Error('Erro ao fazer upload do logo');
+    }
+
     const partner = this.partnerRepository.create({
       ...createPartnerDto,
       logo: logoUrl,
