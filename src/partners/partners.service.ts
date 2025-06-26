@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreatePartnerDto, UpdatePartnerDto } from './dto/partner.dto';
@@ -14,10 +14,21 @@ export class PartnersService {
   ) {}
 
   async create(createPartnerDto: CreatePartnerDto, logo: Express.Multer.File): Promise<Partner> {
+    if (!logo) {
+      throw new BadRequestException('O logo é obrigatório');
+    }
+
     const logoUrl = await this.s3Service.uploadFile(logo, 'partners');
 
     if(!logoUrl) {
-      throw new Error('Erro ao fazer upload do logo');
+      throw new BadRequestException('Erro ao fazer upload do logo');
+    }
+
+    // Validar se a URL retornada é uma URL válida
+    try {
+      new URL(logoUrl);
+    } catch {
+      throw new BadRequestException('URL do logo inválida');
     }
 
     const partner = this.partnerRepository.create({
@@ -49,6 +60,17 @@ export class PartnersService {
       await this.s3Service.deleteFile(partner.logo);
       // Upload new logo
       logoUrl = await this.s3Service.uploadFile(logo, 'partners');
+      
+      if(!logoUrl) {
+        throw new BadRequestException('Erro ao fazer upload do logo');
+      }
+
+      // Validar se a URL retornada é uma URL válida
+      try {
+        new URL(logoUrl);
+      } catch {
+        throw new BadRequestException('URL do logo inválida');
+      }
     }
 
     Object.assign(partner, updatePartnerDto, { logo: logoUrl });

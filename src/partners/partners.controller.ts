@@ -9,6 +9,9 @@ import {
   UseInterceptors,
   UploadedFile,
   ParseUUIDPipe,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { PartnersService } from './partners.service';
@@ -23,7 +26,15 @@ export class PartnersController {
   @UseInterceptors(FileInterceptor('logo'))
   create(
     @Body() createPartnerDto: CreatePartnerDto,
-    @UploadedFile() logo: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({ fileType: /^image\/(jpeg|jpg|png|gif|webp)$/ }),
+        ],
+        errorHttpStatusCode: 400,
+      }),
+    ) logo: Express.Multer.File,
   ) {
     return this.partnersService.create(createPartnerDto, logo);
   }
@@ -45,7 +56,16 @@ export class PartnersController {
   update(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updatePartnerDto: UpdatePartnerDto,
-    @UploadedFile() logo?: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+          new FileTypeValidator({ fileType: /^image\/(jpeg|jpg|png|gif|webp)$/ }),
+        ],
+        errorHttpStatusCode: 400,
+        fileIsRequired: false, // Logo é opcional no update
+      }),
+    ) logo?: Express.Multer.File,
   ) {
     return this.partnersService.update(id, updatePartnerDto, logo);
   }
